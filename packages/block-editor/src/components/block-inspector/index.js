@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
-	hasBlockSupport,
 } from '@wordpress/blocks';
 import {
 	PanelBody,
@@ -20,13 +19,10 @@ import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
 import InspectorControls from '../inspector-controls';
 import InspectorAdvancedControls from '../inspector-advanced-controls';
-import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
-import DefaultStylePicker from '../default-style-picker';
 const BlockInspector = ( {
 	blockType,
 	count,
-	hasBlockStyles,
 	selectedBlockClientId,
 	selectedBlockName,
 	showNoBlockSelectedMessage = true,
@@ -66,21 +62,9 @@ const BlockInspector = ( {
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard blockType={ blockType } />
-			{ hasBlockStyles && (
-				<div>
-					<PanelBody title={ __( 'Styles' ) }>
-						<BlockStyles clientId={ selectedBlockClientId } />
-						{ hasBlockSupport(
-							blockType.name,
-							'defaultStylePicker',
-							true
-						) && (
-							<DefaultStylePicker blockName={ blockType.name } />
-						) }
-					</PanelBody>
-				</div>
-			) }
+
 			<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
+
 			<div>
 				<AdvancedControls
 					slotName={ InspectorAdvancedControls.slotName }
@@ -119,17 +103,13 @@ export default withSelect( ( select ) => {
 		getSelectedBlockCount,
 		getBlockName,
 	} = select( 'core/block-editor' );
-	const { getBlockStyles } = select( 'core/blocks' );
 	const selectedBlockClientId = getSelectedBlockClientId();
 	const selectedBlockName =
 		selectedBlockClientId && getBlockName( selectedBlockClientId );
 	const blockType =
 		selectedBlockClientId && getBlockType( selectedBlockName );
-	const blockStyles =
-		selectedBlockClientId && getBlockStyles( selectedBlockName );
 	return {
 		count: getSelectedBlockCount(),
-		hasBlockStyles: blockStyles && blockStyles.length > 0,
 		selectedBlockName,
 		selectedBlockClientId,
 		blockType,
