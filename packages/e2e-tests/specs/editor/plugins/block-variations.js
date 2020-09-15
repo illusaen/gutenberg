@@ -51,8 +51,12 @@ describe( 'Block variations', () => {
 	test( 'Insert the overridden default Quote block variation', async () => {
 		await insertBlock( 'Large Quote' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		expect(
-			await page.$(
+			await frame.$(
 				'.wp-block[data-type="core/quote"] blockquote.is-style-large'
 			)
 		).toBeDefined();
@@ -82,7 +86,11 @@ describe( 'Block variations', () => {
 	test( 'Insert the Success Message block variation', async () => {
 		await insertBlock( 'Success Message' );
 
-		const successMessageBlock = await page.$(
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
+		const successMessageBlock = await frame.$(
 			'.wp-block[data-type="core/paragraph"]'
 		);
 		expect( successMessageBlock ).toBeDefined();
@@ -93,12 +101,16 @@ describe( 'Block variations', () => {
 	test( 'Pick the additional variation in the inserted Columns block', async () => {
 		await insertBlock( 'Columns' );
 
-		const fourColumnsVariation = await page.waitForSelector(
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
+		const fourColumnsVariation = await frame.waitForSelector(
 			'.wp-block[data-type="core/columns"] .block-editor-block-variation-picker__variation[aria-label="Four columns"]'
 		);
 		await fourColumnsVariation.click();
 		expect(
-			await page.$$(
+			await frame.$$(
 				'.wp-block[data-type="core/columns"] .wp-block[data-type="core/column"]'
 			)
 		).toHaveLength( 4 );

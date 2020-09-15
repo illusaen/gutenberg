@@ -70,6 +70,7 @@ const BlockDraggable = ( {
 		<Draggable
 			cloneClassname={ cloneClassname }
 			elementId={ elementId || `block-${ clientIds[ 0 ] }` }
+			window={ window.frames[ 'editor-content' ] }
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
 				startDraggingBlocks( clientIds );

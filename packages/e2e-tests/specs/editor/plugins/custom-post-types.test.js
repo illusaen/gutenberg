@@ -40,7 +40,10 @@ describe( 'Test Custom Post Types', () => {
 
 		// Create a parent post.
 		await createNewPost( { postType: 'hierar-no-title' } );
-		await page.click( '.block-editor-writing-flow' );
+		let frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( '.block-editor-writing-flow' );
 		await page.keyboard.type( 'Parent Post' );
 		await publishPost();
 		// Create a post that is a child of the previously created post.
@@ -55,7 +58,10 @@ describe( 'Test Custom Post Types', () => {
 			( element ) => element.textContent
 		);
 		await optionToSelect.click();
-		await page.click( '.block-editor-writing-flow' );
+		frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( '.block-editor-writing-flow' );
 		await page.keyboard.type( 'Child Post' );
 		await publishPost();
 		// Reload the child post and verify it is still correctly selected as a child post.

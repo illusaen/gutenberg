@@ -23,8 +23,12 @@ describe( 'invalid blocks', () => {
 		// Change to HTML mode and close the options
 		await clickMenuItem( 'Edit as HTML' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Focus on the textarea and enter an invalid paragraph
-		await page.click(
+		await frame.click(
 			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea'
 		);
 		await page.keyboard.type( '<p>invalid paragraph' );
@@ -35,7 +39,7 @@ describe( 'invalid blocks', () => {
 		expect( console ).toHaveWarned();
 
 		// Click on the 'three-dots' menu toggle
-		await page.click(
+		await frame.click(
 			'.block-editor-warning__actions button[aria-label="More options"]'
 		);
 

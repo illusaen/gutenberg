@@ -73,11 +73,21 @@ describe( 'RichText', () => {
 		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
 		await pressKeyWithModifier( 'primary', 'b' );
 
-		const count = await page.evaluate(
-			() =>
-				document.querySelectorAll( '*[data-rich-text-format-boundary]' )
-					.length
-		);
+		const count = await page.evaluate( () => {
+			function getActiveDocument( doc ) {
+				const { activeElement } = doc;
+
+				if ( activeElement.nodeName === 'IFRAME' ) {
+					return getActiveDocument( activeElement.contentDocument );
+				}
+
+				return doc;
+			}
+
+			return getActiveDocument( document ).querySelectorAll(
+				'*[data-rich-text-format-boundary]'
+			).length;
+		} );
 
 		expect( count ).toBe( 1 );
 	} );
@@ -156,7 +166,18 @@ describe( 'RichText', () => {
 		await page.keyboard.type( '3' );
 
 		await page.evaluate( () => {
+			function getActiveDocument( doc ) {
+				const { activeElement } = doc;
+
+				if ( activeElement.nodeName === 'IFRAME' ) {
+					return getActiveDocument( activeElement.contentDocument );
+				}
+
+				return doc;
+			}
+
 			let called;
+			const document = getActiveDocument( window.document );
 			const { body } = document;
 			const config = {
 				attributes: true,
@@ -288,7 +309,14 @@ describe( 'RichText', () => {
 		// Simulate moving focus to a different app, then moving focus back,
 		// without selection being changed.
 		await page.evaluate( () => {
-			const activeElement = document.activeElement;
+			function getActiveElement( { activeElement } ) {
+				if ( activeElement.nodeName === 'IFRAME' ) {
+					return getActiveElement( activeElement.contentDocument );
+				}
+				return activeElement;
+			}
+
+			const activeElement = getActiveElement( document );
 			activeElement.blur();
 			activeElement.focus();
 		} );

@@ -171,24 +171,27 @@ describe( 'Embedding content', () => {
 	it( 'should render embeds in the correct state', async () => {
 		// Valid embed. Should render valid figure element.
 		await insertEmbed( 'https://twitter.com/notnownikki' );
-		await page.waitForSelector( 'figure.wp-block-embed' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.waitForSelector( 'figure.wp-block-embed' );
 
 		// Valid provider; invalid content. Should render failed, edit state.
 		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
-		await page.waitForSelector(
+		await frame.waitForSelector(
 			'input[value="https://twitter.com/wooyaygutenberg123454312"]'
 		);
 
 		// WordPress invalid content. Should render failed, edit state.
 		await insertEmbed( 'https://wordpress.org/gutenberg/handbook/' );
-		await page.waitForSelector(
+		await frame.waitForSelector(
 			'input[value="https://wordpress.org/gutenberg/handbook/"]'
 		);
 
 		// Provider whose oembed API has gone wrong. Should render failed, edit
 		// state.
 		await insertEmbed( 'https://twitter.com/thatbunty' );
-		await page.waitForSelector(
+		await frame.waitForSelector(
 			'input[value="https://twitter.com/thatbunty"]'
 		);
 
@@ -197,12 +200,12 @@ describe( 'Embedding content', () => {
 		await insertEmbed(
 			'https://wordpress.org/gutenberg/handbook/block-api/attributes/'
 		);
-		await page.waitForSelector( 'figure.wp-block-embed' );
+		await frame.waitForSelector( 'figure.wp-block-embed' );
 
 		// Video content. Should render valid figure element, and include the
 		// aspect ratio class.
 		await insertEmbed( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
-		await page.waitForSelector(
+		await frame.waitForSelector(
 			'figure.wp-block-embed.is-type-video.wp-embed-aspect-16-9'
 		);
 
@@ -215,22 +218,29 @@ describe( 'Embedding content', () => {
 		// URL that can't be embedded.
 		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Wait for the request to fail and present an error. Since placeholder
 		// has styles applied which depend on resize observer, wait for the
 		// expected size class to settle before clicking, since otherwise a race
 		// condition could occur on the placeholder layout vs. click intent.
-		await page.waitForSelector(
+		await frame.waitForSelector(
 			'.components-placeholder.is-large .components-placeholder__error'
 		);
 
-		await clickButton( 'Convert to link' );
+		await clickButton( 'Convert to link', frame );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should retry embeds that could not be embedded with trailing slashes, without the trailing slashes', async () => {
 		await insertEmbed( 'https://twitter.com/notnownikki/' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		// The twitter block should appear correctly.
-		await page.waitForSelector( 'figure.wp-block-embed' );
+		await frame.waitForSelector( 'figure.wp-block-embed' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -238,11 +248,15 @@ describe( 'Embedding content', () => {
 		// URL that can't be embedded.
 		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Wait for the request to fail and present an error. Since placeholder
 		// has styles applied which depend on resize observer, wait for the
 		// expected size class to settle before clicking, since otherwise a race
 		// condition could occur on the placeholder layout vs. click intent.
-		await page.waitForSelector(
+		await frame.waitForSelector(
 			'.components-placeholder.is-large .components-placeholder__error'
 		);
 
@@ -257,8 +271,8 @@ describe( 'Embedding content', () => {
 				),
 			},
 		] );
-		await clickButton( 'Try again' );
-		await page.waitForSelector( 'figure.wp-block-embed' );
+		await clickButton( 'Try again', frame );
+		await frame.waitForSelector( 'figure.wp-block-embed' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -280,7 +294,11 @@ describe( 'Embedding content', () => {
 		await createNewPost();
 		await insertEmbed( postUrl );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Check the block has become a WordPress block.
-		await page.waitForSelector( 'figure.wp-block-embed' );
+		await frame.waitForSelector( 'figure.wp-block-embed' );
 	} );
 } );

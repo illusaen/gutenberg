@@ -501,6 +501,14 @@ export default function WritingFlow( { children } ) {
 
 					if ( navigateDown ) {
 						nextTabbable = focus.tabbable.findNext( wrapper );
+
+						if ( ! nextTabbable ) {
+							nextTabbable =
+								ownerDocument.defaultView.frameElement;
+							nextTabbable = focus.tabbable.findNext(
+								nextTabbable
+							);
+						}
 					} else {
 						nextTabbable = focus.tabbable.findPrevious( wrapper );
 					}
@@ -627,7 +635,7 @@ export default function WritingFlow( { children } ) {
 
 		// In the case of RTL scripts, right means previous and left means next,
 		// which is the exact reverse of LTR.
-		const { direction } = getComputedStyle( target );
+		const { direction } = defaultView.getComputedStyle( target );
 		const isReverseDir = direction === 'rtl' ? ! isReverse : isReverse;
 
 		if ( isShift ) {

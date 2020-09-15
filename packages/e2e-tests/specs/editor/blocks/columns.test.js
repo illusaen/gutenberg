@@ -17,7 +17,10 @@ describe( 'Columns', () => {
 	it( 'restricts all blocks inside the columns block', async () => {
 		await insertBlock( 'Columns' );
 		await closeGlobalBlockInserter();
-		await page.click( '[aria-label="Two columns; equal split"]' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( '[aria-label="Two columns; equal split"]' );
 		await page.click( '[aria-label="Outline"]' );
 		const columnBlockMenuItem = (
 			await page.$x(

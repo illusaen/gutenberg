@@ -15,7 +15,10 @@ const ARABIC_TWO = '٢';
 describe( 'RTL', () => {
 	beforeEach( async () => {
 		await createNewPost();
-		await page.evaluate( () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.evaluate( () => {
 			document.querySelector( '.is-root-container' ).dir = 'rtl';
 		} );
 	} );

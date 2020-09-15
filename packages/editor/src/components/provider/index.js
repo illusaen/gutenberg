@@ -271,7 +271,6 @@ class EditorProvider extends Component {
 
 		return (
 			<>
-				<EditorStyles styles={ settings.styles } />
 				<EntityProvider kind="root" type="site">
 					<EntityProvider
 						kind="postType"

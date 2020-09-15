@@ -69,10 +69,5 @@ export default function useResizeCanvas( deviceType ) {
 		}
 	};
 
-	useSimulatedMediaQuery(
-		'resizable-editor-section',
-		getCanvasWidth( deviceType )
-	);
-
 	return contentInlineStyles( deviceType );
 }

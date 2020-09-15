@@ -38,6 +38,19 @@ function BlockNavigationDropdownToggle( {
 			isDisabled: ! isEnabled,
 		}
 	);
+
+	const contentWindow = window.frames[ 'editor-content' ];
+
+	useShortcut(
+		'core/edit-post/toggle-block-navigation',
+		useCallback( onToggle, [ onToggle ] ),
+		{
+			bindGlobal: true,
+			isDisabled: ! isEnabled || ! contentWindow,
+			altWindow: contentWindow,
+		}
+	);
+
 	const shortcut = useSelect(
 		( select ) =>
 			select( 'core/keyboard-shortcuts' ).getShortcutRepresentation(

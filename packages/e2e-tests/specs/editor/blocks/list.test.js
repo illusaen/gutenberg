@@ -147,7 +147,10 @@ describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.down( 'Shift' );
-		await page.click( '[data-type="core/paragraph"]' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( '[data-type="core/paragraph"]' );
 		await page.keyboard.up( 'Shift' );
 		await transformBlockTo( 'List' );
 
@@ -172,7 +175,10 @@ describe( 'List', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.down( 'Shift' );
-		await page.click( '[data-type="core/paragraph"]' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( '[data-type="core/paragraph"]' );
 		await page.keyboard.up( 'Shift' );
 		await transformBlockTo( 'List' );
 

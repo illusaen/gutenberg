@@ -27,12 +27,15 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 	} );
 
 	it( 'allows all blocks if the allowed blocks setting was not set', async () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		const parentBlockSelector = '[data-type="test/allowed-blocks-unset"]';
 		const childParagraphSelector = `${ parentBlockSelector } ${ paragraphSelector }`;
 		await insertBlock( 'Allowed Blocks Unset' );
 		await closeGlobalBlockInserter();
-		await page.waitForSelector( childParagraphSelector );
-		await page.click( childParagraphSelector );
+		await frame.waitForSelector( childParagraphSelector );
+		await frame.click( childParagraphSelector );
 		await openGlobalBlockInserter();
 		await expect(
 			( await getAllBlockInserterItemTitles() ).length
@@ -40,12 +43,15 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 	} );
 
 	it( 'allows the blocks if the allowed blocks setting was set', async () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		const parentBlockSelector = '[data-type="test/allowed-blocks-set"]';
 		const childParagraphSelector = `${ parentBlockSelector } ${ paragraphSelector }`;
 		await insertBlock( 'Allowed Blocks Set' );
 		await closeGlobalBlockInserter();
-		await page.waitForSelector( childParagraphSelector );
-		await page.click( childParagraphSelector );
+		await frame.waitForSelector( childParagraphSelector );
+		await frame.click( childParagraphSelector );
 		await openGlobalBlockInserter();
 		expect( await getAllBlockInserterItemTitles() ).toEqual( [
 			'Button',
@@ -62,8 +68,11 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 		const parentBlockSelector = '[data-type="test/allowed-blocks-dynamic"]';
 		const blockAppender = '.block-list-appender button';
 		const appenderSelector = `${ parentBlockSelector } ${ blockAppender }`;
-		await page.waitForSelector( appenderSelector );
-		await page.click( appenderSelector );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.waitForSelector( appenderSelector );
+		await frame.click( appenderSelector );
 		expect( await getAllBlockInserterItemTitles() ).toEqual( [
 			'Image',
 			'List',
@@ -74,8 +83,8 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 		await insertButton.click();
 		await insertBlock( 'Image' );
 		await closeGlobalBlockInserter();
-		await page.waitForSelector( '.product[data-number-of-children="2"]' );
-		await page.click( appenderSelector );
+		await frame.waitForSelector( '.product[data-number-of-children="2"]' );
+		await frame.click( appenderSelector );
 		expect( await getAllBlockInserterItemTitles() ).toEqual( [
 			'Gallery',
 			'Video',

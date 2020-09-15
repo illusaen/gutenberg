@@ -17,9 +17,9 @@ import {
 	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
-async function upload( selector ) {
-	await page.waitForSelector( selector );
-	const inputElement = await page.$( selector );
+async function upload( selector, inputFrame ) {
+	await inputFrame.waitForSelector( selector );
+	const inputElement = await inputFrame.$( selector );
 	const testImagePath = path.join(
 		__dirname,
 		'..',
@@ -32,7 +32,10 @@ async function upload( selector ) {
 	const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
 	fs.copyFileSync( testImagePath, tmpFileName );
 	await inputElement.uploadFile( tmpFileName );
-	await page.waitForSelector(
+	const frame = await page
+		.frames()
+		.find( ( f ) => f.name() === 'editor-content' );
+	await frame.waitForSelector(
 		`.wp-block-image img[src$="${ filename }.png"]`
 	);
 	return filename;
@@ -45,7 +48,13 @@ describe( 'Image', () => {
 
 	it( 'can be inserted', async () => {
 		await insertBlock( 'Image' );
-		const filename = await upload( '.wp-block-image input[type="file"]' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		const filename = await upload(
+			'.wp-block-image input[type="file"]',
+			frame
+		);
 
 		const regex = new RegExp(
 			`<!-- wp:image {"id":\\d+,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
@@ -55,7 +64,13 @@ describe( 'Image', () => {
 
 	it( 'should replace, reset size, and keep selection', async () => {
 		await insertBlock( 'Image' );
-		const filename1 = await upload( '.wp-block-image input[type="file"]' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		const filename1 = await upload(
+			'.wp-block-image input[type="file"]',
+			frame
+		);
 
 		const regex1 = new RegExp(
 			`<!-- wp:image {"id":\\d+,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
@@ -73,7 +88,8 @@ describe( 'Image', () => {
 
 		await clickButton( 'Replace' );
 		const filename2 = await upload(
-			'.block-editor-media-replace-flow__options input[type="file"]'
+			'.block-editor-media-replace-flow__options input[type="file"]',
+			page
 		);
 
 		const regex3 = new RegExp(
@@ -81,7 +97,7 @@ describe( 'Image', () => {
 		);
 		expect( await getEditedPostContent() ).toMatch( regex3 );
 
-		await page.click( '.wp-block-image img' );
+		await frame.click( '.wp-block-image img' );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toBe( '' );

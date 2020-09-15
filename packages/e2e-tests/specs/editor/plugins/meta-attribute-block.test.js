@@ -44,7 +44,10 @@ describe( 'Block with a meta attribute', () => {
 				await page.waitForSelector( '.edit-post-layout' );
 
 				expect( await getEditedPostContent() ).toMatchSnapshot();
-				const persistedValue = await page.evaluate(
+				const frame = await page
+					.frames()
+					.find( ( f ) => f.name() === 'editor-content' );
+				const persistedValue = await frame.evaluate(
 					() => document.querySelector( '.my-meta-input' ).value
 				);
 				expect( persistedValue ).toBe( 'Meta Value' );
@@ -56,7 +59,10 @@ describe( 'Block with a meta attribute', () => {
 				await insertBlock( `Test Meta Attribute Block (${ variant })` );
 				await page.keyboard.type( 'Meta Value' );
 
-				const inputs = await page.$$( '.my-meta-input' );
+				const frame = await page
+					.frames()
+					.find( ( f ) => f.name() === 'editor-content' );
+				const inputs = await frame.$$( '.my-meta-input' );
 				await Promise.all(
 					inputs.map( async ( input ) => {
 						// Clicking the input selects the block,
@@ -90,7 +96,10 @@ describe( 'Block with a meta attribute', () => {
 				await page.waitForSelector( '.edit-post-layout' );
 
 				expect( await getEditedPostContent() ).toMatchSnapshot();
-				const persistedValue = await page.evaluate(
+				const frame = await page
+					.frames()
+					.find( ( f ) => f.name() === 'editor-content' );
+				const persistedValue = await frame.evaluate(
 					() => document.querySelector( '.my-meta-input' ).value
 				);
 				expect( persistedValue ).toBe( 'Meta Value' );

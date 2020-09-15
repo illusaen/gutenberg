@@ -13,7 +13,10 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 const getSelection = async () => {
-	return await page.evaluate( () => {
+	const frame = await page
+		.frames()
+		.find( ( f ) => f.name() === 'editor-content' );
+	return await frame.evaluate( () => {
 		const selectedBlock = document.activeElement.closest( '.wp-block' );
 		const blocks = Array.from( document.querySelectorAll( '.wp-block' ) );
 		const blockIndex = blocks.indexOf( selectedBlock );
@@ -174,12 +177,15 @@ describe( 'undo', () => {
 		await saveDraft();
 		await page.reload();
 		await page.waitForSelector( '.edit-post-layout' );
-		await page.click( '[data-type="core/paragraph"]' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.click( '[data-type="core/paragraph"]' );
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'b' );
 		await pressKeyWithModifier( 'primary', 'z' );
 
-		const visibleResult = await page.evaluate(
+		const visibleResult = await frame.evaluate(
 			() => document.activeElement.innerHTML
 		);
 		expect( visibleResult ).toBe( 'test' );
@@ -359,11 +365,15 @@ describe( 'undo', () => {
 
 		await pressKeyWithModifier( 'primary', 'z' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Assert against the _visible_ content. Since editor state with the
 		// regression present was accurate, it would produce the correct
 		// content. The issue had manifested in the form of what was shown to
 		// the user since the blocks state failed to sync to block editor.
-		const visibleContent = await page.evaluate(
+		const visibleContent = await frame.evaluate(
 			() => document.activeElement.textContent
 		);
 		expect( visibleContent ).toBe( 'original' );
@@ -400,7 +410,11 @@ describe( 'undo', () => {
 			await page.$( '.editor-history__undo[aria-disabled="true"]' )
 		).not.toBeNull();
 
-		await page.click( '[data-type="core/paragraph"]' );
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
+		await frame.click( '[data-type="core/paragraph"]' );
 
 		await page.keyboard.type( '2' );
 
