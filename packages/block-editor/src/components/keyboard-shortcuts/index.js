@@ -139,11 +139,7 @@ function KeyboardShortcuts() {
 		'core/block-editor/select-all',
 		useCallback(
 			( event ) => {
-				if (
-					documentHasSelection(
-						event.target.ownerDocument.defaultView
-					)
-				) {
+				if ( documentHasSelection( event.target.ownerDocument ) ) {
 					return;
 				}
 
