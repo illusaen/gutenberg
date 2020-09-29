@@ -681,14 +681,9 @@ export function getOffsetParent( node ) {
 		return null;
 	}
 
-	const { ownerDocument } = closestElement;
-	const { defaultView } = ownerDocument;
-
 	// If the closest element is already positioned, return it, as offsetParent
 	// does not otherwise consider the node itself.
-	if (
-		defaultView.getComputedStyle( closestElement ).position !== 'static'
-	) {
+	if ( getComputedStyle( closestElement ).position !== 'static' ) {
 		return closestElement;
 	}
 

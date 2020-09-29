@@ -665,7 +665,7 @@ function gutenberg_extend_block_editor_styles_html( $settings ) {
 	}
 
 	$handles = array_unique( $handles );
-	$done = wp_styles()->done;
+	$done    = wp_styles()->done;
 
 	ob_start();
 

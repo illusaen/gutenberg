@@ -8,7 +8,12 @@ import { includes, castArray } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, createContext, useContext } from '@wordpress/element';
+import {
+	useEffect,
+	useRef,
+	createContext,
+	useContext,
+} from '@wordpress/element';
 
 /**
  * A block selection object.

@@ -15,7 +15,6 @@ import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
 	BlockContextProvider,
-	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';

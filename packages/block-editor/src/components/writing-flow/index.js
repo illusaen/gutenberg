@@ -635,7 +635,7 @@ export default function WritingFlow( { children } ) {
 
 		// In the case of RTL scripts, right means previous and left means next,
 		// which is the exact reverse of LTR.
-		const { direction } = defaultView.getComputedStyle( target );
+		const { direction } = getComputedStyle( target );
 		const isReverseDir = direction === 'rtl' ? ! isReverse : isReverse;
 
 		if ( isShift ) {
