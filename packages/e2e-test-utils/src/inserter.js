@@ -55,11 +55,12 @@ async function toggleGlobalBlockInserter() {
  * Retrieves the document container by css class and checks to make sure the document's active element is within it
  */
 async function waitForInserterCloseAndContentFocus() {
-	await page.waitForFunction( () =>
-		document.body
+	await page.waitForFunction( () => {
+		const { document: doc } = window.frames[ 'editor-content' ];
+		return doc
 			.querySelector( '.block-editor-block-list__layout' )
-			.contains( document.activeElement )
-	);
+			.contains( doc.activeElement );
+	} );
 }
 
 /**
