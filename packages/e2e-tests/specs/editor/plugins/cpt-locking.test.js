@@ -100,7 +100,10 @@ describe( 'cpt locking', () => {
 		} );
 
 		it( 'should insert line breaks when using enter and shift-enter', async () => {
-			await page.click(
+			const frame = await page
+				.frames()
+				.find( ( f ) => f.name() === 'editor-content' );
+			await frame.click(
 				'.block-editor-block-list__block[data-type="core/paragraph"]'
 			);
 			await page.keyboard.type( 'First line' );
@@ -131,8 +134,13 @@ describe( 'cpt locking', () => {
 		} );
 
 		it( 'can use the global inserter in inner blocks', async () => {
-			await page.click( 'button[aria-label="Two columns; equal split"]' );
-			await page.click(
+			const frame = await page
+				.frames()
+				.find( ( f ) => f.name() === 'editor-content' );
+			await frame.click(
+				'button[aria-label="Two columns; equal split"]'
+			);
+			await frame.click(
 				'.wp-block-column .block-editor-button-block-appender'
 			);
 			await page.type( '.block-editor-inserter__search-input', 'image' );
@@ -145,7 +153,7 @@ describe( 'cpt locking', () => {
 			);
 			await pressKeyTimes( 'Tab', 2 );
 			await page.keyboard.press( 'Enter' );
-			expect( await page.$( '.wp-block-gallery' ) ).not.toBeNull();
+			expect( await frame.$( '.wp-block-gallery' ) ).not.toBeNull();
 		} );
 	} );
 

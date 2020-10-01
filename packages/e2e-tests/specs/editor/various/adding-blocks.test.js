@@ -205,14 +205,18 @@ describe( 'adding blocks', () => {
 		await insertBlock( 'Buttons' );
 		await page.keyboard.type( '1.1' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// After inserting the Buttons block the inner button block should be selected.
-		const selectedButtonBlocks = await page.$$(
+		const selectedButtonBlocks = await frame.$$(
 			'.wp-block-button.is-selected'
 		);
 		expect( selectedButtonBlocks.length ).toBe( 1 );
 
 		// Specifically click the root container appender.
-		await page.click(
+		await frame.click(
 			'.block-editor-block-list__layout.is-root-container > .block-list-appender .block-editor-inserter__toggle'
 		);
 
@@ -240,8 +244,12 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Third paragraph' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Using the between inserter
-		const insertionPoint = await page.$( '[data-type="core/heading"]' );
+		const insertionPoint = await frame.$( '[data-type="core/heading"]' );
 		const rect = await insertionPoint.boundingBox();
 		await page.mouse.move( rect.x + rect.width / 2, rect.y - 10, {
 			steps: 10,

@@ -104,8 +104,11 @@ describe( 'Image', () => {
 	} );
 
 	it( 'should place caret at end of caption after merging empty paragraph', async () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		await insertBlock( 'Image' );
-		await upload( '.wp-block-image input[type="file"]' );
+		await upload( '.wp-block-image input[type="file"]', frame );
 		await page.keyboard.type( '1' );
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.press( 'Backspace' );
@@ -117,8 +120,11 @@ describe( 'Image', () => {
 	} );
 
 	it( 'should allow soft line breaks in caption', async () => {
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
 		await insertBlock( 'Image' );
-		await upload( '.wp-block-image input[type="file"]' );
+		await upload( '.wp-block-image input[type="file"]', frame );
 		await page.keyboard.type( '12' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'Enter' );

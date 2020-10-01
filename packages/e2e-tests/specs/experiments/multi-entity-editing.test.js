@@ -37,11 +37,14 @@ const createTemplatePart = async (
 ) => {
 	// Create new template part.
 	await insertBlock( 'Template Part' );
-	const [ createNewButton ] = await page.$x(
+	const frame = await page
+		.frames()
+		.find( ( f ) => f.name() === 'editor-content' );
+	const [ createNewButton ] = await frame.$x(
 		'//button[contains(text(), "New template part")]'
 	);
 	await createNewButton.click();
-	await page.waitForSelector(
+	await frame.waitForSelector(
 		isNested
 			? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
 			: '.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
@@ -51,7 +54,10 @@ const createTemplatePart = async (
 };
 
 const editTemplatePart = async ( textToAdd, isNested = false ) => {
-	await page.click(
+	const frame = await page
+		.frames()
+		.find( ( f ) => f.name() === 'editor-content' );
+	await frame.click(
 		`${
 			isNested
 				? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"]'
@@ -161,8 +167,12 @@ describe( 'Multi-entity editor states', () => {
 		await visitSiteEditor();
 		await clickTemplateItem( 'Template Parts', 'header' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Wait for blocks to load.
-		await page.waitForSelector( '.wp-block' );
+		await frame.waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
 
@@ -221,7 +231,10 @@ describe( 'Multi-entity editor states', () => {
 		} );
 
 		it( 'should only dirty the child when editing the child', async () => {
-			await page.click(
+			const frame = await page
+				.frames()
+				.find( ( f ) => f.name() === 'editor-content' );
+			await frame.click(
 				'.wp-block[data-type="core/template-part"] .wp-block[data-type="core/paragraph"]'
 			);
 			await page.keyboard.type( 'Some more test words!' );
@@ -232,7 +245,10 @@ describe( 'Multi-entity editor states', () => {
 		} );
 
 		it( 'should only dirty the nested entity when editing the nested entity', async () => {
-			await page.click(
+			const frame = await page
+				.frames()
+				.find( ( f ) => f.name() === 'editor-content' );
+			await frame.click(
 				'.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"] .wp-block[data-type="core/paragraph"]'
 			);
 			await page.keyboard.type( 'Nested test words!' );

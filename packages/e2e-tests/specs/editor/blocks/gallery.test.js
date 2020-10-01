@@ -17,8 +17,11 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
-	await page.waitForSelector( selector );
-	const inputElement = await page.$( selector );
+	const frame = await page
+		.frames()
+		.find( ( f ) => f.name() === 'editor-content' );
+	await frame.waitForSelector( selector );
+	const inputElement = await frame.$( selector );
 	const testImagePath = path.join(
 		__dirname,
 		'..',
@@ -31,7 +34,7 @@ async function upload( selector ) {
 	const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
 	fs.copyFileSync( testImagePath, tmpFileName );
 	await inputElement.uploadFile( tmpFileName );
-	await page.waitForSelector(
+	await frame.waitForSelector(
 		`.wp-block-gallery img[src$="${ filename }.png"]`
 	);
 	return filename;

@@ -51,9 +51,13 @@ describe( 'Block context', () => {
 	test( 'Block context propagates to inner blocks', async () => {
 		await insertBlock( 'Test Context Provider' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Inserting the context provider block should select the first inner
 		// block of the template. Verify the contents of the consumer.
-		let innerBlockText = await page.evaluate(
+		let innerBlockText = await frame.evaluate(
 			() => document.activeElement.textContent
 		);
 		expect( innerBlockText ).toBe( 'The record ID is: 0' );
@@ -64,7 +68,7 @@ describe( 'Block context', () => {
 
 		// Verify propagated context changes.
 		await page.keyboard.press( 'ArrowDown' );
-		innerBlockText = await page.evaluate(
+		innerBlockText = await frame.evaluate(
 			() => document.activeElement.textContent
 		);
 		expect( innerBlockText ).toBe( 'The record ID is: 123' );
@@ -82,9 +86,13 @@ describe( 'Block context', () => {
 		);
 		expect( content ).toMatch( /^0,\d+,post$/ );
 
+		const frame = await editorPage
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Return to editor to change context value to non-default.
 		await editorPage.bringToFront();
-		await editorPage.focus(
+		await frame.focus(
 			'[data-type="gutenberg/test-context-provider"] input'
 		);
 		await editorPage.keyboard.press( 'ArrowRight' );

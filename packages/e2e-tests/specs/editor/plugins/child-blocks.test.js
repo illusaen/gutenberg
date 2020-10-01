@@ -34,10 +34,13 @@ describe( 'Child Blocks', () => {
 	it( 'shows up in a parent block', async () => {
 		await insertBlock( 'Child Blocks Unrestricted Parent' );
 		await closeGlobalBlockInserter();
-		await page.waitForSelector(
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.waitForSelector(
 			'[data-type="test/child-blocks-unrestricted-parent"] .block-editor-default-block-appender'
 		);
-		await page.click(
+		await frame.click(
 			'[data-type="test/child-blocks-unrestricted-parent"] .block-editor-default-block-appender'
 		);
 		await openGlobalBlockInserter();
@@ -49,10 +52,13 @@ describe( 'Child Blocks', () => {
 	it( 'display in a parent block with allowedItems', async () => {
 		await insertBlock( 'Child Blocks Restricted Parent' );
 		await closeGlobalBlockInserter();
-		await page.waitForSelector(
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+		await frame.waitForSelector(
 			'[data-type="test/child-blocks-restricted-parent"] .block-editor-default-block-appender'
 		);
-		await page.click(
+		await frame.click(
 			'[data-type="test/child-blocks-restricted-parent"] .block-editor-default-block-appender'
 		);
 		await openGlobalBlockInserter();

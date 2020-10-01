@@ -221,11 +221,14 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 }
 
 async function selectDropDownOption( optionText ) {
-	const selectToggle = await page.waitForSelector(
+	const frame = await page
+		.frames()
+		.find( ( f ) => f.name() === 'editor-content' );
+	const selectToggle = await frame.waitForSelector(
 		'.wp-block-navigation-placeholder__select-control button'
 	);
 	await selectToggle.click();
-	const theOption = await page.waitForXPath(
+	const theOption = await frame.waitForXPath(
 		`//li[text()="${ optionText }"]`
 	);
 	await theOption.click();
@@ -233,13 +236,16 @@ async function selectDropDownOption( optionText ) {
 
 async function clickCreateButton() {
 	const buttonText = 'Create';
+	const frame = await page
+		.frames()
+		.find( ( f ) => f.name() === 'editor-content' );
 	// Wait for button to become available
-	await page.waitForXPath(
+	await frame.waitForXPath(
 		`//button[text()="${ buttonText }"][not(@disabled)]`
 	);
 
 	// Then locate...
-	const createNavigationButton = await page.waitForXPath(
+	const createNavigationButton = await frame.waitForXPath(
 		`//button[text()="${ buttonText }"][not(@disabled)]`
 	);
 
@@ -253,9 +259,12 @@ async function createEmptyNavBlock() {
 }
 
 async function addLinkBlock() {
+	const frame = await page
+		.frames()
+		.find( ( f ) => f.name() === 'editor-content' );
 	// Using 'click' here checks for regressions of https://github.com/WordPress/gutenberg/issues/18329,
 	// an issue where the block appender requires two clicks.
-	await page.click( '.wp-block-navigation .block-list-appender' );
+	await frame.click( '.wp-block-navigation .block-list-appender' );
 
 	const [ linkButton ] = await page.$x(
 		"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Link']"
@@ -308,14 +317,18 @@ describe( 'Navigation', () => {
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 
-			await page.waitForSelector(
+			const frame = await page
+				.frames()
+				.find( ( f ) => f.name() === 'editor-content' );
+
+			await frame.waitForSelector(
 				'.wp-block-navigation-placeholder__select-control button'
 			);
-			await page.click(
+			await frame.click(
 				'.wp-block-navigation-placeholder__select-control button'
 			);
 
-			const dropDownItemsLength = await page.$$eval(
+			const dropDownItemsLength = await frame.$$eval(
 				'ul[role="listbox"] li[role="option"]',
 				( els ) => els.length
 			);
@@ -324,7 +337,9 @@ describe( 'Navigation', () => {
 			// 1. Create empty menu.
 			expect( dropDownItemsLength ).toEqual( 1 );
 
-			await page.waitForXPath( '//li[text()="Create empty Navigation"]' );
+			await frame.waitForXPath(
+				'//li[text()="Create empty Navigation"]'
+			);
 
 			// Snapshot should contain the mocked menu items.
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -342,12 +357,16 @@ describe( 'Navigation', () => {
 
 			await clickCreateButton();
 
-			await page.waitForSelector( '.wp-block-navigation__container' );
+			const frame = await page
+				.frames()
+				.find( ( f ) => f.name() === 'editor-content' );
+
+			await frame.waitForSelector( '.wp-block-navigation__container' );
 
 			// Scope element selector to the Editor's "Content" region as otherwise it picks up on
 			// block previews.
-			const navBlockItemsLength = await page.$$eval(
-				'[aria-label="Editor content"][role="region"] li[aria-label="Block: Link"]',
+			const navBlockItemsLength = await frame.$$eval(
+				'li[aria-label="Block: Link"]',
 				( els ) => els.length
 			);
 
@@ -391,14 +410,18 @@ describe( 'Navigation', () => {
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 
-			await page.waitForSelector(
+			const frame = await page
+				.frames()
+				.find( ( f ) => f.name() === 'editor-content' );
+
+			await frame.waitForSelector(
 				'.wp-block-navigation-placeholder__select-control button'
 			);
-			await page.click(
+			await frame.click(
 				'.wp-block-navigation-placeholder__select-control button'
 			);
 
-			const dropDownItemsLength = await page.$$eval(
+			const dropDownItemsLength = await frame.$$eval(
 				'ul[role="listbox"] li[role="option"]',
 				( els ) => els.length
 			);
@@ -407,7 +430,9 @@ describe( 'Navigation', () => {
 			// 1. Create empty menu.
 			expect( dropDownItemsLength ).toEqual( 1 );
 
-			await page.waitForXPath( '//li[text()="Create empty Navigation"]' );
+			await frame.waitForXPath(
+				'//li[text()="Create empty Navigation"]'
+			);
 
 			// Snapshot should contain the mocked menu items.
 			expect( await getEditedPostContent() ).toMatchSnapshot();

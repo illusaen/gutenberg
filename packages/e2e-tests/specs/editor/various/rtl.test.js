@@ -104,8 +104,12 @@ describe( 'RTL', () => {
 	it( 'should navigate inline boundaries', async () => {
 		await page.keyboard.press( 'Enter' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Wait for rich text editor to load.
-		await page.waitForSelector( '.block-editor-rich-text__editable' );
+		await frame.waitForSelector( '.block-editor-rich-text__editable' );
 
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( ARABIC_ONE );

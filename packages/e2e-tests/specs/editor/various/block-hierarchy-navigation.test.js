@@ -164,9 +164,13 @@ describe( 'Navigating the block hierarchy', () => {
 		// Insert a group block
 		await insertBlock( 'Group' );
 
+		const frame = await page
+			.frames()
+			.find( ( f ) => f.name() === 'editor-content' );
+
 		// Insert some random blocks.
 		// The last block shouldn't be a textual block.
-		await page.click( '.block-list-appender .block-editor-inserter' );
+		await frame.click( '.block-list-appender .block-editor-inserter' );
 		const paragraphMenuItem = (
 			await page.$x( `//button//span[contains(text(), 'Paragraph')]` )
 		 )[ 0 ];
@@ -178,7 +182,7 @@ describe( 'Navigating the block hierarchy', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Unselect the blocks
-		await page.click( '.editor-post-title' );
+		await frame.click( '.editor-post-title' );
 
 		// Try selecting the group block using the Outline
 		await page.click( '[aria-label="Outline"]' );
@@ -190,7 +194,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await groupMenuItem.click();
 
 		// The group block's wrapper should be selected.
-		const isGroupBlockSelected = await page.evaluate(
+		const isGroupBlockSelected = await frame.evaluate(
 			() =>
 				document.activeElement.getAttribute( 'data-type' ) ===
 				'core/group'
