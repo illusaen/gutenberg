@@ -191,9 +191,3 @@ jobs:
       run: |
         $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
-
-    - name: Archive screenshots
-      uses: actions/upload-artifact@v2
-      with:
-        name: code-coverage-report
-        path: screenshots
