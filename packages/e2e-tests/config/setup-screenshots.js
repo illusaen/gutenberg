@@ -26,9 +26,11 @@ export const registerScreenshotReporter = () => {
 	 * access to the page instance. Using jasmine reporter allows us to
 	 * have access to the test result, test name and page instance at the same time.
 	 */
+	console.log( 'Registering a reporter' );
 	jasmine.getEnv().addReporter( {
 		specDone: async ( result ) => {
 			if ( result.status === 'failed' ) {
+				console.log( 'Taking a screenshot of ' + result.fullName );
 				screenshotPromise = screenshotPromise
 					.catch()
 					.then( () => takeScreenshot( result.fullName ) );
@@ -49,5 +51,6 @@ function takeScreenshot( testName ) {
 		.replace( / /g, '-' );
 
 	const path = `${ SCREENSHOTS_PATH }/${ slug }.jpg`;
+	console.log( 'takeScreenshot called ' + path );
 	return page.screenshot( { path } );
 }
