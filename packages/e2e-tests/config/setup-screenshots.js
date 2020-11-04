@@ -4,60 +4,46 @@
 const fs = require( 'fs' );
 const SCREENSHOTS_PATH = __dirname + '/../../../screenshots';
 
-// Inspired by @dennismphil https://github.com/smooth-code/jest-puppeteer/issues/131#issuecomment-605739007
-
 if ( ! fs.existsSync( SCREENSHOTS_PATH ) ) {
 	fs.mkdirSync( SCREENSHOTS_PATH );
 }
-console.log( SCREENSHOTS_PATH );
-const wrappedTest = ( test, description ) => {
-	return Promise.resolve()
-		.then( test )
-		.catch( async ( err ) => {
-			// Assuming you have a method to take a screenshot
-			const filename = description
-				.toLowerCase()
-				.replace( /[^0-9a-zA-Z \-\(\)]/g, '' )
-				.replace( / /g, '-' );
-			await page.screenshot( {
-				path: SCREENSHOTS_PATH + `/${ filename }.jpg`,
-			} );
-			console.log(
-				'took screen',
-				SCREENSHOTS_PATH + `/${ filename }.jpg`
-			);
 
-			throw err;
-		} );
+/**
+ * @copyright Tom Esterez (@testerez) https://github.com/smooth-code/jest-puppeteer/issues/131#issuecomment-424073620
+ */
+export const registerScreenshotReporter = () => {
+	/**
+	 * jasmine reporter does not support async.
+	 * So we store the screenshot promise and wait for it before each test
+	 */
+	let screenshotPromise = Promise.resolve();
+	beforeEach( () => screenshotPromise );
+	afterAll( () => screenshotPromise );
+
+	/**
+	 * Take a screenshot on Failed test.
+	 * Jest standard reporters run in a separate process so they don't have
+	 * access to the page instance. Using jasmine reporter allows us to
+	 * have access to the test result, test name and page instance at the same time.
+	 */
+	jasmine.getEnv().addReporter( {
+		specDone: async ( result ) => {
+			if ( result.status === 'failed' ) {
+				screenshotPromise = screenshotPromise
+					.catch()
+					.then( () => takeScreenshot( result.fullName ) );
+			}
+		},
+	} );
 };
 
-// Make a copy of the original function
-const originalIt = global.it;
+registerScreenshotReporter();
 
-// Modify `it` to use the wrapped test method
-global.it = function it( description, test, timeout ) {
-	// Pass on the context by using `call` instead of directly invoking the method.
-	return originalIt.call(
-		this,
-		description,
-		wrappedTest.bind( this, test, description ),
-		timeout
-	);
-};
-
-// Copy other function properties like `skip`, `only`...
-for ( const prop in originalIt ) {
-	if ( Object.prototype.hasOwnProperty.call( originalIt, prop ) ) {
-		global.it[ prop ] = originalIt[ prop ];
-	}
+function takeScreenshot( testName ) {
+	const fileName = testName
+		.toLowerCase()
+		.replace( /[^0-9a-zA-Z \-\(\)]/g, '' )
+		.replace( / /g, '-' );
+	const path = `${ SCREENSHOTS_PATH }/${ fileName }.png`;
+	return page.screenshot( { path } );
 }
-
-// Monkey patch the `only` method also to use the wrapper method
-global.it.only = function only( description, test, timeout ) {
-	return originalIt.only.call(
-		this,
-		description,
-		wrappedTest.bind( this, test, description ),
-		timeout
-	);
-};
