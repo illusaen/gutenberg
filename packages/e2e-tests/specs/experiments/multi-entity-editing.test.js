@@ -164,7 +164,7 @@ describe( 'Multi-entity editor states', () => {
 		// Wait for blocks to load.
 		await page.waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
-		expect( await isEntityDirty( 'front-page' ) ).toBe( true );
+		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
 
 		// Switch back and make sure it is still clean.
 		await clickTemplateItem( 'Templates', templateName );
@@ -237,7 +237,7 @@ describe( 'Multi-entity editor states', () => {
 			);
 			await page.keyboard.type( 'Nested test words!' );
 
-			expect( await isEntityDirty( templateName ) ).toBe( false );
+			expect( await isEntityDirty( templateName ) ).toBe( false ); // Broken on purpose to test the screenshots
 			expect( await isEntityDirty( templatePartName ) ).toBe( false );
 			expect( await isEntityDirty( nestedTPName ) ).toBe( true );
 		} );
