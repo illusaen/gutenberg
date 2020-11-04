@@ -40,10 +40,14 @@ export const registerScreenshotReporter = () => {
 registerScreenshotReporter();
 
 function takeScreenshot( testName ) {
-	const fileName = testName
+	const datetime = new Date().toISOString().split( '.' )[ 0 ];
+	const readableName = `${ testName } ${ datetime }`;
+	const slug = readableName
 		.toLowerCase()
+		.replace( /:/g, '-' )
 		.replace( /[^0-9a-zA-Z \-\(\)]/g, '' )
 		.replace( / /g, '-' );
-	const path = `${ SCREENSHOTS_PATH }/${ fileName }.png`;
+
+	const path = `${ SCREENSHOTS_PATH }/${ slug }.jpg`;
 	return page.screenshot( { path } );
 }
