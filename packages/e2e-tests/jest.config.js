@@ -13,4 +13,5 @@ module.exports = {
 		'<rootDir>/wordpress/',
 		'e2e-tests/specs/performance/',
 	],
+	verbose: true
 };

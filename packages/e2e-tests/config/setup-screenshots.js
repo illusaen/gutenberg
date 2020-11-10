@@ -28,10 +28,14 @@ export const registerScreenshotReporter = () => {
 	 */
 	process.stdout.write( 'Registering a reporter' );
 	process.stderr.write( 'Registering a reporter' );
+
+	console.error( 'Registering a reporter' );
 	jasmine.getEnv().addReporter( {
 		specDone: async ( result ) => {
 			process.stdout.write( 'Test results: ' + JSON.stringify( result ) );
 			process.stderr.write( 'Test results: ' + JSON.stringify( result ) );
+
+			console.error( 'Test results: ' + JSON.stringify( result ) );
 			if ( result.status === 'failed' ) {
 				process.stdout.write(
 					'Taking a screenshot of ' + result.fullName
@@ -39,6 +43,7 @@ export const registerScreenshotReporter = () => {
 				process.stderr.write(
 					'Taking a screenshot of ' + result.fullName
 				);
+				console.error( 'Taking a screenshot of ' + result.fullName );
 				screenshotPromise = screenshotPromise
 					.catch()
 					.then( () => takeScreenshot( result.fullName ) );
