@@ -53,6 +53,7 @@ jobs:
 
     - name: Archive screenshots
       uses: actions/upload-artifact@v2
+      if: always()
       with:
         name: failures-screenshots
         path: $GITHUB_WORKSPACE/screenshots
@@ -100,6 +101,7 @@ jobs:
 
     - name: Archive screenshots
       uses: actions/upload-artifact@v2
+      if: always()
       with:
         name: failures-screenshots
         path: $GITHUB_WORKSPACE/screenshots
@@ -147,6 +149,7 @@ jobs:
 
     - name: Archive screenshots
       uses: actions/upload-artifact@v2
+      if: always()
       with:
         name: failures-screenshots
         path: $GITHUB_WORKSPACE/screenshots
@@ -194,6 +197,7 @@ jobs:
 
     - name: Archive screenshots
       uses: actions/upload-artifact@v2
+      if: always()
       with:
         name: failures-screenshots
         path: $GITHUB_WORKSPACE/screenshots
