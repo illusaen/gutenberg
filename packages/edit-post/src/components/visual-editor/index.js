@@ -18,7 +18,6 @@ import {
 } from '@wordpress/block-editor';
 import { Popover, DropZoneProvider } from '@wordpress/components';
 import { useState, useEffect, createPortal } from '@wordpress/element';
-import { useKeyboardShortcut } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -26,12 +25,10 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockInspectorButton from './block-inspector-button';
 import { useSelect } from '@wordpress/data';
-import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 
 export const IFrame = ( { children, head, styles, ...props } ) => {
 	const [ contentRef, setContentRef ] = useState();
-	const win = contentRef && contentRef.contentWindow;
-	const doc = contentRef && contentRef.contentWindow.document;
+	const doc = contentRef && contentRef.contentDocument;
 
 	useEffect( () => {
 		if ( doc ) {
@@ -69,6 +66,23 @@ export const IFrame = ( { children, head, styles, ...props } ) => {
 
 				return acc;
 			}, [] );
+
+			function bubbleEvent( event ) {
+				const newEvent = new window.KeyboardEvent( event.type, event );
+				const cancelled = ! contentRef.dispatchEvent( newEvent );
+
+				if ( cancelled ) {
+					event.preventDefault();
+				}
+			}
+
+			doc.addEventListener( 'keydown', bubbleEvent );
+			doc.addEventListener( 'keypress', bubbleEvent );
+
+			return () => {
+				doc.removeEventListener( 'keydown', bubbleEvent );
+				doc.removeEventListener( 'keypress', bubbleEvent );
+			};
 		}
 	}, [ doc ] );
 
@@ -79,9 +93,7 @@ export const IFrame = ( { children, head, styles, ...props } ) => {
 			title={ __( 'Editor content' ) }
 			name="editor-content"
 		>
-			<useKeyboardShortcut.WindowContext.Provider value={ win }>
-				{ doc && createPortal( children, doc.body ) }
-			</useKeyboardShortcut.WindowContext.Provider>
+			{ doc && createPortal( children, doc.body ) }
 		</iframe>
 	);
 };
@@ -105,8 +117,6 @@ function VisualEditor( { settings } ) {
 			>
 				<BlockSelectionClearer>
 					<DropZoneProvider>
-						<VisualEditorGlobalKeyboardShortcuts />
-						<EditPostKeyboardShortcuts />
 						<MultiSelectScrollIntoView />
 						<Typewriter>
 							<CopyHandler>
