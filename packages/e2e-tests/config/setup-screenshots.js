@@ -27,11 +27,16 @@ export const registerScreenshotReporter = () => {
 	 * have access to the test result, test name and page instance at the same time.
 	 */
 	process.stdout.write( 'Registering a reporter' );
+	process.stderr.write( 'Registering a reporter' );
 	jasmine.getEnv().addReporter( {
 		specDone: async ( result ) => {
 			process.stdout.write( 'Test results: ' + JSON.stringify( result ) );
+			process.stderr.write( 'Test results: ' + JSON.stringify( result ) );
 			if ( result.status === 'failed' ) {
 				process.stdout.write(
+					'Taking a screenshot of ' + result.fullName
+				);
+				process.stderr.write(
 					'Taking a screenshot of ' + result.fullName
 				);
 				screenshotPromise = screenshotPromise
