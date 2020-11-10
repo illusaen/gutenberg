@@ -88,62 +88,71 @@ class Draggable extends Component {
 		const {
 			cloneClassname,
 			elementId,
+			element = document.getElementById( elementId ),
 			transferData,
 			onDragStart = noop,
-			window: win = window,
 		} = this.props;
-		const { document } = win;
-		const element = document.getElementById( elementId );
+		const { ownerDocument } = element;
+		const { defaultView } = ownerDocument;
 
-		win.focus();
-
-		if ( ! element ) {
-			event.preventDefault();
-			return;
-		}
+		defaultView.focus();
 
 		// Set a fake drag image to avoid browser defaults. Remove from DOM
 		// right after. event.dataTransfer.setDragImage is not supported yet in
 		// IE, we need to check for its existence first.
 		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
-			const dragImage = document.createElement( 'div' );
+			const dragImage = ownerDocument.createElement( 'div' );
 			dragImage.id = `drag-image-${ elementId }`;
 			dragImage.classList.add( dragImageClass );
-			document.body.appendChild( dragImage );
+			ownerDocument.body.appendChild( dragImage );
 			event.dataTransfer.setDragImage( dragImage, 0, 0 );
 			this.props.setTimeout( () => {
-				document.body.removeChild( dragImage );
+				ownerDocument.body.removeChild( dragImage );
 			} );
 		}
 
 		event.dataTransfer.setData( 'text', JSON.stringify( transferData ) );
 
-		// Prepare element clone and append to element wrapper.
-		const elementRect = element.getBoundingClientRect();
-		const elementWrapper = element.parentNode;
-		const elementTopOffset = parseInt( elementRect.top, 10 );
-		const elementLeftOffset = parseInt( elementRect.left, 10 );
-		this.cloneWrapper = document.createElement( 'div' );
-		this.cloneWrapper.classList.add( cloneWrapperClass );
-		if ( cloneClassname ) {
-			this.cloneWrapper.classList.add( cloneClassname );
-		}
-
-		this.cloneWrapper.style.width = `${
-			elementRect.width + clonePadding * 2
-		}px`;
-
 		// If a dragComponent is defined, the following logic will clone the
 		// HTML node and inject it into the cloneWrapper.
 		if ( this.dragComponentRef.current ) {
+			const {
+				ownerDocument: dragComponentDocument,
+			} = this.dragComponentRef.current;
+
+			this.cloneWrapper = dragComponentDocument.createElement( 'div' );
+			this.cloneWrapper.classList.add( cloneWrapperClass );
+
 			// Position dragComponent at the same position as the cursor.
 			this.cloneWrapper.style.top = `${ event.clientY }px`;
 			this.cloneWrapper.style.left = `${ event.clientX }px`;
 
-			const clonedDragComponent = document.createElement( 'div' );
+			const clonedDragComponent = dragComponentDocument.createElement(
+				'div'
+			);
 			clonedDragComponent.innerHTML = this.dragComponentRef.current.innerHTML;
 			this.cloneWrapper.appendChild( clonedDragComponent );
+
+			// Inject the cloneWrapper into the DOM.
+			dragComponentDocument.body.appendChild( this.cloneWrapper );
 		} else {
+			// Prepare element clone and append to element wrapper.
+			const elementRect = element.getBoundingClientRect();
+			const elementWrapper = element.parentNode;
+			const elementTopOffset = parseInt( elementRect.top, 10 );
+			const elementLeftOffset = parseInt( elementRect.left, 10 );
+
+			this.cloneWrapper = ownerDocument.createElement( 'div' );
+			this.cloneWrapper.classList.add( cloneWrapperClass );
+
+			if ( cloneClassname ) {
+				this.cloneWrapper.classList.add( cloneClassname );
+			}
+
+			this.cloneWrapper.style.width = `${
+				elementRect.width + clonePadding * 2
+			}px`;
+
 			const clone = element.cloneNode( true );
 			clone.id = `clone-${ elementId }`;
 
@@ -170,17 +179,27 @@ class Draggable extends Component {
 			).forEach( ( child ) => child.parentNode.removeChild( child ) );
 
 			this.cloneWrapper.appendChild( clone );
+
+			// Inject the cloneWrapper into the DOM.
+			elementWrapper.appendChild( this.cloneWrapper );
 		}
 
-		// Inject the cloneWrapper into the DOM.
-		elementWrapper.appendChild( this.cloneWrapper );
+		let bufferX = 0;
+		let bufferY = 0;
+
+		if ( defaultView.frameElement ) {
+			const bufferRect = defaultView.frameElement.getBoundingClientRect();
+			bufferX = bufferRect.left;
+			bufferY = bufferRect.top;
+		}
 
 		// Mark the current cursor coordinates.
-		this.cursorLeft = event.clientX;
-		this.cursorTop = event.clientY;
+		this.cursorLeft = event.clientX - bufferX;
+		this.cursorTop = event.clientY - bufferY;
+
 		// Update cursor to 'grabbing', document wide.
-		document.body.classList.add( 'is-dragging-components-draggable' );
-		document.addEventListener( 'dragover', this.onDragOver );
+		ownerDocument.body.classList.add( 'is-dragging-components-draggable' );
+		ownerDocument.addEventListener( 'dragover', this.onDragOver );
 
 		// Allow the Synthetic Event to be accessed from asynchronous code.
 		// https://reactjs.org/docs/events.html#event-pooling
@@ -193,10 +212,14 @@ class Draggable extends Component {
 	 * while dragging.
 	 */
 	resetDragState() {
-		const { window: win = window } = this.props;
-		const { document } = win;
+		const {
+			elementId,
+			element = document.getElementById( elementId ),
+		} = this.props;
+		const { ownerDocument } = element;
+
 		// Remove drag clone
-		document.removeEventListener( 'dragover', this.onDragOver );
+		ownerDocument.removeEventListener( 'dragover', this.onDragOver );
 		if ( this.cloneWrapper && this.cloneWrapper.parentNode ) {
 			this.cloneWrapper.parentNode.removeChild( this.cloneWrapper );
 			this.cloneWrapper = null;
@@ -206,7 +229,9 @@ class Draggable extends Component {
 		this.cursorTop = null;
 
 		// Reset cursor.
-		document.body.classList.remove( 'is-dragging-components-draggable' );
+		ownerDocument.body.classList.remove(
+			'is-dragging-components-draggable'
+		);
 	}
 
 	render() {
