@@ -55,7 +55,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: failures-screenshots
-        path: screenshots
+        path: $GITHUB_WORKSPACE/screenshots
 
   admin-2:
     name: Admin - 2
@@ -102,7 +102,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: failures-screenshots
-        path: screenshots
+        path: $GITHUB_WORKSPACE/screenshots
 
   admin-3:
     name: Admin - 3
@@ -149,7 +149,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: failures-screenshots
-        path: screenshots
+        path: $GITHUB_WORKSPACE/screenshots
 
   admin-4:
     name: Admin - 4
@@ -196,5 +196,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: failures-screenshots
-        path: screenshots
+        path: $GITHUB_WORKSPACE/screenshots
 

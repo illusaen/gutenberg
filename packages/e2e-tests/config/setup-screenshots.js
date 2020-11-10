@@ -2,7 +2,8 @@
  * External dependencies
  */
 const fs = require( 'fs' );
-const SCREENSHOTS_PATH = __dirname + '/../../../screenshots';
+const root = process.env.GITHUB_WORKSPACE || '../../../';
+const SCREENSHOTS_PATH = root + '/screenshots';
 
 if ( ! fs.existsSync( SCREENSHOTS_PATH ) ) {
 	fs.mkdirSync( SCREENSHOTS_PATH );
@@ -64,6 +65,8 @@ function takeScreenshot( testName ) {
 		.replace( / /g, '-' );
 
 	const path = `${ SCREENSHOTS_PATH }/${ slug }.jpg`;
-	console.log( 'takeScreenshot called ' + path );
+	process.stdout.write( 'takeScreenshot called ' + path );
+	process.stderr.write( 'takeScreenshot called ' + path );
+	console.error( 'takeScreenshot called ' + path );
 	return page.screenshot( { path } );
 }
