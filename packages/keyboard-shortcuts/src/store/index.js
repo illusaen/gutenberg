@@ -1,17 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { registerAtomicStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import reducer from './reducer';
+import * as atoms from './atoms';
 import * as actions from './actions';
 import * as selectors from './selectors';
 
-export default registerStore( 'core/keyboard-shortcuts', {
-	reducer,
+export default registerAtomicStore( 'core/keyboard-shortcuts', {
+	atoms,
 	actions,
 	selectors,
 } );

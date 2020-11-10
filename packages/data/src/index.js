@@ -23,6 +23,7 @@ export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
 export { controls } from './controls';
+export { createAtom, createAtomRegistry } from './atom';
 
 /**
  * Object of available plugins to use with a registry.
@@ -177,3 +178,5 @@ export const registerStore = defaultRegistry.registerStore;
  * @param {Object} plugin Plugin object.
  */
 export const use = defaultRegistry.use;
+
+export const registerAtomicStore = defaultRegistry.registerAtomicStore;

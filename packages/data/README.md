@@ -336,6 +336,14 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="createAtom" href="#createAtom">#</a> **createAtom**
+
+Undocumented declaration.
+
+<a name="createAtomRegistry" href="#createAtomRegistry">#</a> **createAtomRegistry**
+
+Undocumented declaration.
+
 <a name="createRegistry" href="#createRegistry">#</a> **createRegistry**
 
 Creates a new store registry, given an optional object of initial store
@@ -460,6 +468,10 @@ _Related_
 _Type_
 
 -   `Object` 
+
+<a name="registerAtomicStore" href="#registerAtomicStore">#</a> **registerAtomicStore**
+
+Undocumented declaration.
 
 <a name="registerGenericStore" href="#registerGenericStore">#</a> **registerGenericStore**
 
