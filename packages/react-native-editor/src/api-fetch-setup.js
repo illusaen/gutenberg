@@ -8,12 +8,14 @@ import apiFetch from '@wordpress/api-fetch';
 const SUPPORTED_ENDPOINTS = [
 	/wp\/v2\/(media|categories)\/?\d*?.*/i,
 	/wp\/v2\/search\?.*/i,
+	/wpcom\/v2\/?.*/i,
 ];
 
 const setTimeoutPromise = ( delay ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, delay ) );
 
 const fetchHandler = ( { path }, retries = 20, retryCount = 1 ) => {
+	console.log( '******* PATH', path );
 	if ( ! isPathSupported( path ) ) {
 		return Promise.reject( `Unsupported path: ${ path }` );
 	}
