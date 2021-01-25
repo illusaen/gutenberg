@@ -61,10 +61,6 @@ const BlockActionsMenu = ( {
 	const blockActionsMenuPickerRef = useRef();
 	const blockTransformationMenuPickerRef = useRef();
 	const moversOptions = { keys: [ 'icon', 'actionTitle' ] };
-
-	// FIXME: Add actual transform option here
-	const canTransformBlock = true;
-
 	const clipboardBlock = clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
 	const isPasteEnabled =
 		clipboardBlock &&
@@ -183,8 +179,7 @@ const BlockActionsMenu = ( {
 		wrapBlockMover && allOptions.backwardButton,
 		wrapBlockMover && allOptions.forwardButton,
 		wrapBlockSettings && allOptions.settings,
-		canTransformBlock &&
-			selectedBlockPossibleTransformations.length &&
+		selectedBlockPossibleTransformations.length &&
 			allOptions.transformButton,
 		allOptions.copyButton,
 		allOptions.cutButton,
